@@ -105,9 +105,16 @@ export class DetectionAPI {
 
   async healthCheck(): Promise<boolean> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/health`);
+      const response = await axios.get(`${API_BASE_URL}/health`, {
+        timeout: 10000, // 10 seconds timeout
+        headers: {
+          'Accept': 'application/json',
+        }
+      });
+      console.log('Health check response:', response.data);
       return response.data.status === 'healthy';
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Health check failed:', error.message);
       return false;
     }
   }

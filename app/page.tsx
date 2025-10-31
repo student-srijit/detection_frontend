@@ -12,10 +12,20 @@ export default function Home() {
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
 
   useEffect(() => {
-    // Check server status on mount
-    detectionAPI.healthCheck().then(isHealthy => {
+    // Check server status on mount and periodically
+    const checkHealth = async () => {
+      console.log('Checking server health...');
+      const isHealthy = await detectionAPI.healthCheck();
+      console.log('Server healthy:', isHealthy);
       setServerStatus(isHealthy ? 'online' : 'offline');
-    });
+    };
+    
+    checkHealth();
+    
+    // Check every 30 seconds
+    const interval = setInterval(checkHealth, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const handleFileSelect = async (file: File) => {
